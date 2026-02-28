@@ -16,11 +16,12 @@ for i in range(SPECIAL_COUNT):
     st.subheader(f"Special Number {i+1}")
     num = st.number_input(f"Special number:", key=f"special_num_{i}", value=5)
     repeat_sets = st.number_input(
-        f"In how many sets {num} should appear (max 3 per set)?",
-        key=f"repeat_{i}",
-        min_value=1,
-        max_value=TOTAL_SETS,  # cannot exceed total sets
-        value=1
+    f"In how many sets {num} should appear (max 3 per set)?",
+    key=f"repeat_{i}",
+    min_value=1,
+    max_value=1000,  # allow user to type any reasonable number
+    value=1
+
     )
     special_rules.append({"number": num, "repeat_sets": repeat_sets})
 
