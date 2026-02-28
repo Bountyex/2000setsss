@@ -15,11 +15,14 @@ special_rules = []
 for i in range(SPECIAL_COUNT):
     st.subheader(f"Special Number {i+1}")
     num = st.number_input(f"Special number:", key=f"special_num_{i}", value=5)
-    repeat_sets = st.number_input(f"In how many sets {num} should appear (max 3 per set)?", key=f"repeat_{i}", min_value=1, max_value=TOTAL_SETS, value=1)
-    special_rules.append({
-        "number": num,
-        "repeat_sets": repeat_sets
-    })
+    repeat_sets = st.number_input(
+        f"In how many sets {num} should appear (max 3 per set)?",
+        key=f"repeat_{i}",
+        min_value=1,
+        max_value=TOTAL_SETS,  # cannot exceed total sets
+        value=1
+    )
+    special_rules.append({"number": num, "repeat_sets": repeat_sets})
 
 OUTPUT_FILE = "multi_repeat_no_row_repeat_final.txt"
 
@@ -40,13 +43,8 @@ numbers_pool = [
 # HELPER FUNCTION
 # ===============================
 def place_number_no_same_row(grid, num, times):
-    """
-    Place a number in the grid in different rows.
-    Ensures no number repeats in the same row and max per row is 1.
-    """
     rows_available = [r for r in range(len(grid)) if num not in grid[r] and any(cell is None for cell in grid[r])]
-    if len(rows_available) < times:
-        times = len(rows_available)
+    times = min(times, len(rows_available))
     if times == 0:
         return
     chosen_rows = random.sample(rows_available, times)
@@ -60,6 +58,7 @@ def place_number_no_same_row(grid, num, times):
 # ===============================
 if st.button("Generate Sets"):
     all_sets = []
+
     for set_index in range(TOTAL_SETS):
         grid = [[None]*GRID_SIZE for _ in range(GRID_SIZE)]
         used_counts = {}
@@ -71,7 +70,7 @@ if st.button("Generate Sets"):
                 place_number_no_same_row(grid, num, 3)
                 used_counts[num] = 3
 
-        # ----- Place a random number 2 times -----
+        # ----- Place one random number 2 times -----
         available_for_random_repeat = [n for n in numbers_pool if used_counts.get(n,0) <= 1]
         if available_for_random_repeat:
             random_num = random.choice(available_for_random_repeat)
@@ -105,7 +104,6 @@ if st.button("Generate Sets"):
         all_sets.append(block)
 
     if all_sets:
-        # Save to file
         with open(OUTPUT_FILE, "w") as f:
             f.write("\n\n".join(all_sets))
 
